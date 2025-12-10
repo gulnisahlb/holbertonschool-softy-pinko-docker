@@ -1,0 +1,29 @@
+server {
+    listen 80; # Listen for incoming connections on port 80 (HTTP)
+    server_name example.com www.example.com; # Define the domain names this server block handles
+
+    # Root directory for static files
+    root /var/www/html/example; 
+
+    # Default index files to serve
+    index index.html index.htm;
+
+    # Location block to handle requests for the root path
+    location / {
+        try_files $uri $uri/ =404; # Try to serve the requested file, then the directory index, otherwise return 404
+    }
+
+    # Example of a location block for a specific path (e.g., a reverse proxy)
+    location /api/ {
+        proxy_pass http://localhost:3000; # Forward requests to a backend server running on port 3000
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    # Custom error page for 50x errors
+    error_page 500 502 503 504 /50x.html;
+    location = /50x.html {
+        root /usr/share/nginx/html; # Path to the custom error page
+    }
+}
